@@ -1,0 +1,25 @@
+# Rumbo is a static site with no build step: no bundler, no framework, no
+# node_modules. Netlify just serves the repository root.
+
+[build]
+  publish = "."
+
+# The app uses hash routing, so this is only a safety net for anyone who types a
+# clean path by hand. Existing files always win over this rule.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
