@@ -1,9 +1,9 @@
-// Client-side mirror of the SQL in supabase/migrations/*roi_engine*.sql.
+// Client-side mirror of the SQL in the roi_engine migration.
 //
-// Why duplicate the maths? So that dragging an assumption slider recomputes the
-// whole comparison instantly, with no network round trip. Postgres stays the
-// source of truth for the initial ranking and for any future API consumer; this
-// file must stay numerically identical to it. If you change one, change both.
+// Why duplicate the maths? So that changing an assumption recomputes the whole
+// comparison instantly, with no network round trip. Postgres stays the source of
+// truth for the initial ranking and for any future API consumer; this file must
+// stay numerically identical to it. If you change one, change both.
 
 export const DEFAULTS = {
   currentSalary: 8500, // MXN per month, a common wage for a young CDMX worker
@@ -28,6 +28,10 @@ export const FIELDS = [
   ["education", "Education"],
 ];
 
+export const FIELD_LABELS = Object.fromEntries(
+  FIELDS.filter(([value]) => value).map(([value, label]) => [value, label])
+);
+
 export const CREDENTIAL_LABELS = {
   bachelor: "Bachelor's degree",
   associate: "Associate degree",
@@ -35,6 +39,12 @@ export const CREDENTIAL_LABELS = {
   certificate: "Short course",
   industry_certification: "Industry certification",
   apprenticeship: "Paid apprenticeship",
+};
+
+export const MODALITY_LABELS = {
+  onsite: "On site",
+  hybrid: "Hybrid",
+  online: "Online",
 };
 
 export const CONFIDENCE_LABELS = {
@@ -91,6 +101,7 @@ export function score(row, assumptions) {
 
   return {
     ...row,
+    currentSalary,
     outOfPocket,
     forgone,
     totalCost,
@@ -140,21 +151,24 @@ export function cashFlowCurve(scored) {
 
 /* ------------------------------- formatting ------------------------------- */
 
-const pesos = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  maximumFractionDigits: 0,
-});
+const plain = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
 
-export const money = (n) => pesos.format(Math.round(Number(n) || 0));
+/** Pesos, written the way an English-language financial page would write them. */
+export function money(n) {
+  const value = Math.round(Number(n) || 0);
+  const sign = value < 0 ? "\u2212" : "";
+  return `${sign}$${plain.format(Math.abs(value))}`;
+}
+
 export const pct = (n) => `${Math.round((Number(n) || 0) * 100)}%`;
 
 export function duration(months) {
   const m = Number(months);
-  if (!Number.isFinite(m)) return "—";
-  if (m < 12) return `${m} mo`;
+  if (!Number.isFinite(m)) return "\u2014";
+  if (m < 12) return `${m} months`;
   const years = m / 12;
-  return Number.isInteger(years) ? `${years} yr` : `${years.toFixed(1)} yr`;
+  const text = Number.isInteger(years) ? `${years}` : years.toFixed(1);
+  return `${text} ${text === "1" ? "year" : "years"}`;
 }
 
 export function payback(scored) {

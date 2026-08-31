@@ -6,8 +6,9 @@
 //     API key.
 //  3. It is fully auditable, which matters when the output is financial advice.
 //
-// Accepts Spanish and English in the same sentence, because that is how people
-// in Mexico City actually write.
+// The interface is English, but the parser accepts Spanish and English in the
+// same sentence on purpose. That is how people in Mexico City actually write,
+// and refusing their own words would defeat the point of the product.
 
 const FIELD_PATTERNS = [
   ["data_ai", /\b(datos|data|anal[ií]tica|analytics|analista|scientist|machine learning|inteligencia artificial|\bia\b|\bai\b|power ?bi|sql)\b/i],
@@ -25,6 +26,28 @@ const FIELD_PATTERNS = [
   ["education", /\b(educaci[oó]n|education|docente|teacher|maestr[oa]|pedagog|ense[nñ]ar|teaching)\b/i],
 ];
 
+const FIELD_LABELS = {
+  software: "Software",
+  data_ai: "Data & AI",
+  design: "Design",
+  health: "Health",
+  trades: "Skilled trades",
+  business: "Business & sales",
+  manufacturing: "Manufacturing",
+  logistics: "Logistics",
+  energy: "Energy",
+  automotive: "Automotive",
+  beauty: "Beauty",
+  hospitality: "Hospitality",
+  education: "Education",
+};
+
+const MODALITY_LABELS = {
+  online: "Online",
+  hybrid: "Hybrid",
+  onsite: "On site",
+};
+
 const MODALITY_PATTERNS = [
   ["online", /\b(en l[ií]nea|online|remoto|remote|a distancia|virtual|desde casa|from home)\b/i],
   ["hybrid", /\b(h[ií]brid|hybrid|mixto|semipresencial)\b/i],
@@ -35,16 +58,16 @@ const MODALITY_PATTERNS = [
 const BUDGET_CUE = /(presupuesto|budget|tengo|cuento con|puedo pagar|puedo gastar|afford|ahorr|savings?|saved|max(?:imo)?|hasta|invertir|invest)/i;
 const SALARY_CUE = /(gano|gana|ganando|gan[eé]|sueldo|salario|salary|wage|earn(?:ing)?s?|i make|make about|ingreso|income|al mes gano)/i;
 
+const num = new Intl.NumberFormat("en-US");
+
 /** "40 mil" -> 40000, "40k" -> 40000, "40,000" -> 40000, "1.5k" -> 1500 */
 function toNumber(raw) {
   if (!raw) return null;
   let text = String(raw).toLowerCase().trim();
   let multiplier = 1;
 
-  if (/\bmillones?\b|\bmill?\b|\bm\b(?!x)/.test(text) && !/\bmxn\b/.test(text)) {
-    if (/mill/.test(text)) multiplier = 1000000;
-  }
-  if (/\bmil\b|\bk\b/.test(text)) multiplier = 1000;
+  if (/mill/.test(text)) multiplier = 1000000;
+  else if (/\bmil\b|\bk\b/.test(text)) multiplier = 1000;
 
   // Strip everything that is not a digit or a decimal separator.
   let digits = text.replace(/[^\d.,]/g, "");
@@ -90,7 +113,7 @@ export function parseQuery(raw, defaults) {
   for (const [field, pattern] of FIELD_PATTERNS) {
     if (pattern.test(text)) {
       result.field = field;
-      understood.push({ key: "Field", value: field.replace("_", " & ") });
+      understood.push({ key: "Field", value: FIELD_LABELS[field] || field });
       break;
     }
   }
@@ -98,7 +121,7 @@ export function parseQuery(raw, defaults) {
   for (const [modality, pattern] of MODALITY_PATTERNS) {
     if (pattern.test(text)) {
       result.modality = modality;
-      understood.push({ key: "Modality", value: modality });
+      understood.push({ key: "Modality", value: MODALITY_LABELS[modality] });
       break;
     }
   }
@@ -106,7 +129,7 @@ export function parseQuery(raw, defaults) {
   const salary = findCuedAmount(text, SALARY_CUE);
   if (salary != null && salary > 0 && salary < 500000) {
     result.currentSalary = salary;
-    understood.push({ key: "Current income", value: `MXN ${salary.toLocaleString("es-MX")}/mo` });
+    understood.push({ key: "Income now", value: `$${num.format(salary)}/mo` });
   }
 
   let budget = findCuedAmount(text, BUDGET_CUE);
@@ -118,7 +141,7 @@ export function parseQuery(raw, defaults) {
   }
   if (budget != null && budget >= 0) {
     result.budget = budget;
-    understood.push({ key: "Cash budget", value: `MXN ${budget.toLocaleString("es-MX")}` });
+    understood.push({ key: "Cash budget", value: `$${num.format(budget)}` });
   }
 
   const monthsMatch = text.match(/(\d+)\s*(meses|mes|months?|mos?)\b/i);
@@ -131,10 +154,10 @@ export function parseQuery(raw, defaults) {
     result.maxMonths = 12;
   }
   if (result.maxMonths) {
-    understood.push({ key: "Max duration", value: `${result.maxMonths} months` });
+    understood.push({ key: "Max length", value: `${result.maxMonths} months` });
   }
 
-  if (/\b(sin licenciatura|no universidad|no quiero universidad|no degree|without a degree|no college)\b/i.test(text)) {
+  if (/\b(sin licenciatura|sin universidad|no universidad|no quiero universidad|no degree|without a degree|no college|not a degree)\b/i.test(text)) {
     result.credentials = [
       "technical_diploma",
       "certificate",
