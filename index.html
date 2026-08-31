@@ -1,50 +1,58 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Rumbo &mdash; The price system Mexican education never had</title>
-<meta name="description" content="Compare every education path in Mexico City by what it truly costs you and when it actually pays you back. Free for learners, forever." />
-<meta property="og:title" content="Rumbo" />
-<meta property="og:description" content="The price system Mexican education never had." />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%A7%AD%3C/text%3E%3C/svg%3E" />
-<link rel="stylesheet" href="./assets/styles.css" />
-</head>
-<body>
-<a class="skip" href="#view">Skip to content</a>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Rumbo — When does your education pay you back?</title>
+    <meta
+      name="description"
+      content="Compare every education path in Mexico City by what it truly costs you and when it pays you back. Free for learners, always."
+    />
+    <meta name="color-scheme" content="light" />
+    <link rel="preconnect" href="https://skbadqkzpdsfgszxgprf.supabase.co" crossorigin />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2314532d'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='20' fill='%23faf9f6' text-anchor='middle'%3ER%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="assets/styles.css" />
+  </head>
+  <body>
+    <a class="skip" href="#view">Skip to content</a>
 
-<header class="topbar">
-  <a class="brand" href="#/">
-    <span class="brand-mark" aria-hidden="true">&#129517;</span>
-    <span>
-      <strong>Rumbo</strong>
-      <em>The price system Mexican education never had</em>
-    </span>
-  </a>
-  <nav>
-    <a href="#/" data-nav="home">Search</a>
-    <a href="#/routes" data-nav="routes">Compare</a>
-    <a href="#/providers" data-nav="providers">For providers</a>
-    <a href="#/method" data-nav="method">Method</a>
-  </nav>
-</header>
+    <header class="masthead">
+      <div class="wrap masthead-inner">
+        <a class="brand" href="#/">
+          <span class="brand-mark">R</span>
+          <span class="brand-words">
+            <span class="brand-name">Rumbo</span>
+            <span class="brand-sub">Education prices, Mexico City</span>
+          </span>
+        </a>
+        <nav class="nav" aria-label="Main">
+          <a data-nav="home" href="#/">Search</a>
+          <a data-nav="routes" href="#/routes">Compare</a>
+          <a data-nav="providers" href="#/providers">For providers</a>
+          <a data-nav="method" href="#/method">Method</a>
+        </nav>
+      </div>
+    </header>
 
-<main id="view" tabindex="-1">
-  <div class="loading">Loading the catalog&hellip;</div>
-</main>
+    <main class="wrap" id="view"></main>
 
-<footer class="footer">
-  <p>
-    <strong>Rumbo</strong> is free for learners and will stay free. Providers pay to be
-    listed with <em>verified</em> outcomes, never to rank higher.
-  </p>
-  <p class="muted">
-    Built for the FEE Mexico City Hackathon 2026 &middot;
-    <a href="https://github.com/hackathon-fee/rumbo" rel="noopener">Source code</a> &middot;
-    Every number is traceable to a source. Nothing here is a guess we hide.
-  </p>
-</footer>
+    <footer class="footer">
+      <div class="wrap footer-inner">
+        <p>
+          <strong>Rumbo</strong> — the price system Mexican education never had.
+          Free for learners, always. All figures in Mexican pesos.
+        </p>
+        <p class="muted">
+          Built for the FEE Mexico City Hackathon, September 2026.
+          <a href="https://github.com/hackathon-fee/rumbo" rel="noopener" target="_blank">Source code</a>
+          &middot; <a href="#/method">How the numbers are built</a>
+        </p>
+      </div>
+    </footer>
 
-<script type="module" src="./assets/app.js"></script>
-</body>
+    <script type="module" src="assets/app.js"></script>
+  </body>
 </html>
